@@ -1,0 +1,14 @@
+---
+- name: "{{cookiecutter.playbook_name}} v0.1.0 - {{cookiecutter.description}}"
+  hosts: all
+  tasks: []
+  {% if cookiecutter.use_standard_roles -%}
+  roles:
+    - nekeal.users
+    - nekeal.postgresql_db
+    - nekeal.nginx
+    - nekeal.certbot
+    - nekeal.docker_app
+  {% else %}
+  roles: []
+  {% endif %}

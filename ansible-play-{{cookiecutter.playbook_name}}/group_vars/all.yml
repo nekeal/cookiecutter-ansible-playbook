@@ -1,2 +1,127 @@
 ---
 # default vars to apply to all hosts
+_project_name: {{ cookiecutter.project_name }}
+{% raw -%}
+
+_app_user: "{{ _full_project_name }}"
+_app_dir: "/home/{{ _app_user }}/passit"
+
+_git_repo_url: git@github.com:nekeal/passit.git
+_git_repo_version: master
+_docker_image_name: "{{ _project_name }}"
+_docker_tag: "{{ _git_repo_version }}"
+
+_base_ssh_keys:
+  - nekeal
+
+_app_users:
+  - username: "{{ _app_user }}"
+    uid: "{{ _app_user_uid }}"
+    ssh_keys: "{{ _base_ssh_keys }}"
+
+
+_base_users:
+  - username: nekeal
+    groups:
+      - docker
+      - sudo
+    ssh_keys:
+      - nekeal
+
+
+_base_envvars:
+  POSTGRES_DB: "{{ _full_project_name }}"
+  POSTGRES_USER: "{{ _full_project_name }}"
+  POSTGRES_PASSWORD: "{{ _db_password }}"
+_additional_envvars: {}
+_envvars: "{{ _base_envvars | combine(_additional_envvars) }}"
+
+users_groups:
+  - docker
+
+users: "{{ _base_users }} + {{ _app_users }}"
+
+postgresql_users:
+  - name: "{{ _full_project_name }}"
+    password: "{{ _db_password }}"
+
+postgresql_databases:
+  - name: "{{ _full_project_name }}"
+    owner: "{{ _full_project_name }}"
+    state: present
+
+
+certbot_create_if_missing: yes
+certbot_create_method: webroot
+certbot_webroot_path: /var/www/letsencrypt
+certbot_staging_mode: false
+
+certbot_certs:
+  - email: "!REQUIRED!"
+    domains: "{{ _domains }}"
+
+nginx_vhosts:
+  - name: "{{ _full_project_name }}"
+    server_names: "{{ _domains }}"
+    upstreams:
+      - name: "{{ _full_project_name }}"
+        server: "localhost:{{ _app_port }}"
+    template: django-vhost.j2
+    snippets:
+      - location: "~* /static/(.*\\.)(js|css)"
+        template: cache.j2
+        expiries: 365d
+        alias: "/home/{{ _app_user }}/static/$1$2"
+      - location: "/"
+        upstream: "{{ _full_project_name }}"
+        template: proxy.j2
+    extra_static_roots:
+      - location: "/.well-known/acme-challenge/"
+        root: "/var/www/letsencrypt/"
+    enable_https: true
+    static_root: "/home/{{ _app_user }}/static/"
+    media_root: "/home/{{ _app_user }}/media/"
+    certificate: "/etc/letsencrypt/live/{{ _domains.0 }}/fullchain.pem"
+    private_key: "/etc/letsencrypt/live/{{ _domains.0 }}/privkey.pem"
+
+docker_containers:
+  - name: "{{ _full_project_name }}"
+    image: "{{ _docker_image_name }}:{{ _docker_tag }}"
+    pull: no
+    state: started
+    network_mode: host
+    restart_policy: always
+    mounts:
+      - source: "/home/{{ _app_user }}/static"
+        target: /app/static
+        type: bind
+      - source: "/home/{{ _app_user }}/media"
+        target: /app/media
+        type: bind
+    user: "{{ _app_user_uid }}:{{ _app_user_uid }}"
+    env: "{{ _envvars }}"
+    command: "!REQUIRED!"
+    comparisons:
+      "*": strict
+    pre_release_commands:
+      - command: "python manage.py collectstatic --no-input"
+        not_changed_when_string_in_output: "0 static files copied"
+    post_release_commands:
+      - command: "python manage.py migrate"
+        not_changed_when_string_in_output: "no migrations to apply"
+
+docker_app_git_repositories:
+  - repo: "{{ _git_repo_url }}"
+    dest:  "{{ _app_dir }}"
+    version: "{{ _git_repo_version }}"
+    accept_hostkey: yes
+    owner: "{{ _app_user }}"
+
+docker_app_create_directories:
+  - root: "{{ _app_dir }}"
+    owner: "{{ _app_user }}"
+    directories:
+      - logs
+      - media
+      - static
+{% endraw %}

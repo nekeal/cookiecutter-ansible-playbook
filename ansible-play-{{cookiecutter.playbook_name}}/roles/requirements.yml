@@ -1,0 +1,12 @@
+{% if cookiecutter.use_standard_roles %}
+- src: nekeal.users
+  version: 1.2.1
+- src: nekeal.nginx
+  version: 3.0.1
+- src: nekeal.postgresql_db
+  version: 1.1.0
+- src: nekeal.docker_app
+  version: 1.1.1
+- src: nekeal.certbot
+  version: 3.2.0
+{% endif %}

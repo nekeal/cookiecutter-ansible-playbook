@@ -1,0 +1,8 @@
+_full_project_name: "{{ cookiecutter.project_name }}_stage"
+_db_password: "{{ random_ascii_string(12, punctuation=true) }}"
+_additional_envvars:
+  DJANGO_SETTINGS_MODULE: 
+  DJANGO_SECRET_KEY: {{ random_ascii_string(50, punctuation=true) }}
+_domains: []
+_app_user_uid:
+_app_port:
