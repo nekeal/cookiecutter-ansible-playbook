@@ -39,7 +39,7 @@ _envvars: "{{ _base_envvars | combine(_additional_envvars) }}"
 users_groups:
   - docker
 
-users: "{{ _base_users }} + {{ _app_users }}"
+users: "{{ _base_users + _app_users }}"
 
 postgresql_users:
   - name: "{{ _full_project_name }}"
