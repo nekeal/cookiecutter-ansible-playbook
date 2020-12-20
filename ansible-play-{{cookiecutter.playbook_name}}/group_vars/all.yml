@@ -10,7 +10,7 @@ _git_repo_url: git@github.com:<user>/<project>.git
 _git_repo_version: master
 _docker_image_name: "{{ _project_name }}"
 _docker_tag: "{{ _git_repo_version }}"
-
+_docker_run_command: !REQUIRED!
 _base_ssh_keys:
   - nekeal
 
@@ -100,7 +100,7 @@ docker_containers:
         type: bind
     user: "{{ _app_user_uid }}:{{ _app_user_uid }}"
     env: "{{ _envvars }}"
-    command: "!REQUIRED!"
+    command: "{{ _docker_run_command }}"
     comparisons:
       "*": strict
     pre_release_commands:
