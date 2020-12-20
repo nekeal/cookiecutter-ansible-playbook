@@ -55,10 +55,10 @@ certbot_create_if_missing: yes
 certbot_create_method: webroot
 certbot_webroot_path: /var/www/letsencrypt
 certbot_staging_mode: false
+certbot_admin_email: !REQUIRED!
 
 certbot_certs:
-  - email: "!REQUIRED!"
-    domains: "{{ _domains }}"
+  - domains: "{{ _domains }}"
 
 nginx_vhosts:
   - name: "{{ _full_project_name }}"
