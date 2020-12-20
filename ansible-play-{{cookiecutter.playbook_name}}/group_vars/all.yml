@@ -6,7 +6,7 @@ _project_name: {{ cookiecutter.project_name }}
 _app_user: "{{ _full_project_name }}"
 _app_dir: "/home/{{ _app_user }}/passit"
 
-_git_repo_url: git@github.com:nekeal/passit.git
+_git_repo_url: git@github.com:<user>/<project>.git
 _git_repo_version: master
 _docker_image_name: "{{ _project_name }}"
 _docker_tag: "{{ _git_repo_version }}"
