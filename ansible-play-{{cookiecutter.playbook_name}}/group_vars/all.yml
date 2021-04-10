@@ -4,11 +4,11 @@ _project_name: {{ cookiecutter.project_name }}
 {% raw -%}
 
 _app_user: "{{ _full_project_name }}"
-_app_dir: "/home/{{ _app_user }}/passit"
+_app_dir: "/home/{{ _app_user }}/{{ _project_name }}/"
 
-_git_repo_url: git@github.com:<user>/<project>.git
+_git_repo_url: git@github.com:!USER!/!PROJECT!.git
 _git_repo_version: master
-_docker_image_name: "{{ _project_name }}"
+_docker_image_name: !REQUIRED!
 _docker_tag: "{{ _git_repo_version }}"
 _docker_run_command: !REQUIRED!
 _base_ssh_keys:
@@ -28,6 +28,7 @@ _base_users:
     ssh_keys:
       - nekeal
 
+zsh_user: nekeal
 
 _base_envvars:
   POSTGRES_DB: "{{ _full_project_name }}"
@@ -87,16 +88,16 @@ nginx_vhosts:
 docker_containers:
   - name: "{{ _full_project_name }}"
     image: "{{ _docker_image_name }}:{{ _docker_tag }}"
-    pull: no
+    pull: yes
     state: started
     network_mode: host
     restart_policy: always
     mounts:
       - source: "/home/{{ _app_user }}/static"
-        target: /app/static
+        target: /static
         type: bind
       - source: "/home/{{ _app_user }}/media"
-        target: /app/media
+        target: /media
         type: bind
     user: "{{ _app_user_uid }}:{{ _app_user_uid }}"
     env: "{{ _envvars }}"
@@ -118,10 +119,19 @@ docker_app_git_repositories:
     owner: "{{ _app_user }}"
 
 docker_app_create_directories:
-  - root: "{{ _app_dir }}"
+  - root: "/home/{{ _app_user }}"
     owner: "{{ _app_user }}"
     directories:
       - logs
       - media
       - static
+
+docker_registry_state: present
+docker_registry_users:
+  - nekeal
+  - root
+
+docker_registry_username: !REQUIRED!
+docker_registry_password: !REQUIRED!
+docker_registry_url: !REQUIRED!
 {% endraw %}
