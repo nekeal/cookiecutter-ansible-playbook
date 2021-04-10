@@ -8,7 +8,6 @@ _app_dir: "/home/{{ _app_user }}/{{ _project_name }}/"
 
 _git_repo_url: git@github.com:!USER!/!PROJECT!.git
 _git_repo_version: master
-_docker_image_name: !REQUIRED!
 _docker_tag: "{{ _git_repo_version }}"
 _docker_run_command: !REQUIRED!
 _base_ssh_keys:
@@ -130,8 +129,4 @@ docker_registry_state: present
 docker_registry_users:
   - nekeal
   - root
-
-docker_registry_username: !REQUIRED!
-docker_registry_password: !REQUIRED!
-docker_registry_url: !REQUIRED!
 {% endraw %}

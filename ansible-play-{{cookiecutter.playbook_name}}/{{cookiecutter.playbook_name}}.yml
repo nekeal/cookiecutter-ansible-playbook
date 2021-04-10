@@ -1,7 +1,11 @@
 ---
 - name: "{{cookiecutter.playbook_name}} v0.1.0 - {{cookiecutter.description}}"
+  user: deployer
+  become: yes
   hosts: all
   tasks: []
+  vars_files:
+    - "group_vars/secrets.yml"
   {% if cookiecutter.use_standard_roles -%}
   roles:
     - nekeal.users
