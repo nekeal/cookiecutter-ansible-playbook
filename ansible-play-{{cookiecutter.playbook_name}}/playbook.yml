@@ -1,5 +1,0 @@
----
-- name: "{{cookiecutter.playbook_name}} v0.1.0 - {{cookiecutter.description}}"
-  hosts: all
-  tasks: []
-  roles: []
